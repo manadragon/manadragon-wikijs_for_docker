@@ -1,0 +1,45 @@
+# Use root/example as user/password credentials
+version: '3.1'
+
+services:
+
+  mariadb:
+    container_name: mariadb
+    image: mariadb:latest
+    #    ports:
+    #      - 3306:3306
+    restart: always
+    networks:
+      - backend
+    environment:
+      MARIADB_DATABASE: wiki
+      MARIADB_USER: wikijs
+      MARIADB_PASSWORD: wikijsrocks
+      MARIADB_ROOT_PASSWORD: mariadb_root_password
+      TZ: Asia/Seoul
+    volumes:
+      - ./mariadb-data:/var/lib/mysql
+
+  wiki:
+    container_name: wiki
+    image: eodeun_wiki:0.1
+    restart: unless-stopped
+    ports:
+      - 2080:3000
+    depends_on:
+      - mariadb
+    networks:
+      - backend
+    environment:
+      DB_TYPE: mysql
+      # DB_HOST 접속을 시도하는 host 이다. 
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_USER: wikijs
+      DB_PASS: wikijsrocks
+      DB_NAME: wiki
+
+networks:
+  backend:
+
+

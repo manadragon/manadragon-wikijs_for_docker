@@ -1,0 +1,20 @@
+# =================
+# 복구 컨테이너 실행
+# =================
+# docker compose -f restore.yml run --rm restore
+# 백업된 파일을 호스트 시스템으로 복사
+# cp ./백업_디렉토리/backup.tar.gz ./로컬_백업_디렉토리
+
+version: '3'
+services:
+  mariadb:
+    image: mariadb
+    volumes:
+      - ./mariadb-data:/var/lib/mysql
+
+  restore:
+    image: busybox
+    volumes:
+      - ./backup:/source
+      - ./mariadb-data:/destination
+    command: ["sh", "-c", "tar -xzf /source/backup.tar.gz -C /destination --strip-components=1"]
